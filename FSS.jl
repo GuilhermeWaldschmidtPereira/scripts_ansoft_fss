@@ -46,6 +46,9 @@ function polar()
 end
 vx, vy, vx2, vy2, vx3, vy3, vx4, vy4 = polar()
 
+pushfirst!(PyVector(pyimport("sys")."path"), ".")
+py_imported = pyimport("build_script_vbs")
+
 v2x = (vx.+16.5)
 v2y = (vy.-16.5)
 v2x2 = (vx2.+16.5)
@@ -63,42 +66,39 @@ plot!(v2x4, v2y4, label = "", color = "blue")
 x, y = v2x[197:200], v2y[197:200]
 data = DataFrame(x=x, y=y)
 model = lm(@formula(y ~0+ x), data)
-println(coef(model))
 x = 0:0.01:(v2x[199]+v2x[200])/2
 y = predict(model, DataFrame(x=x))
 plot!(x,y, color = "black", label = "")
+py_imported.build_file(x,y, "espiral_1")
 
 x,y = v2x2[198:200], v2y2[198:200]
 data = DataFrame(x=x, y=y)
 model = lm(@formula(y ~ 0+x), data)
-println(coef(model))
 x = 0:0.1:v2x2[200]
 y = predict(model, DataFrame(x=x))
 plot!(x,y, color = "black", label = "")
+py_imported.build_file(x,y, "espiral_2")
 
 x,y = v2x3[197:200], v2y3[197:200]
 data = DataFrame(x=x, y=y)
 model = lm(@formula(y ~ 0+x), data)
-println(coef(model))
 x = v2x3[200]:0.1:0.1
 y = predict(model, DataFrame(x=x))
 plot!(x,y, color = "black", label = "")
+py_imported.build_file(x,y, "espiral_3")
 
 x,y = v2x4[197:200], v2y4[197:200]
 data = DataFrame(x=x, y=y)
 model = lm(@formula(y ~ 0+x), data)
-println(coef(model))
 x = v2x4[200]:0.1:0.1
 y = predict(model, DataFrame(x=x))
 plot!(x,y, color = "black", label = "")
 num_linhas = length(v2x)
+py_imported.build_file(x,y, "espiral_4")
 
-# Adiciona o diretório atual ao sys.path para permitir a importação do script
-pushfirst!(PyVector(pyimport("sys")."path"), ".")
-py_imported = pyimport("build_script_vbs")
+py_imported.build_file(v2x, v2y, "espiral_5")
+py_imported.build_file(v2x2, v2y2, "espiral_6")
+py_imported.build_file(v2x3, v2y3, "espiral_7")
+py_imported.build_file(v2x4, v2y4, "espiral_8")
 
-# Chama a função Python definida no script "build_script_vbs.py"
-resultado = py_imported.build_file(vx, vy, "espiral_1")
-resultado = py_imported.build_file(vx2, vy2, "espiral_2")
-resultado = py_imported.build_file(vx3, vy3, "espiral_3")
-resultado = py_imported.build_file(vx4, vy4, "espiral_4")
+println("Script Finalizado!")
